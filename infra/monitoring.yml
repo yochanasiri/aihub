@@ -1,0 +1,26 @@
+services:
+  backend:
+    environment:
+      METRICS_ENABLED: "true"
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=15d"]
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:12.1.1
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set a Grafana admin password}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports: ["127.0.0.1:3001:3000"]
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/datasource.yml:/etc/grafana/provisioning/datasources/aihub.yml:ro
+      - ./monitoring/dashboards.yml:/etc/grafana/provisioning/dashboards/aihub.yml:ro
+      - ./monitoring/dashboards:/etc/grafana/aihub-dashboards:ro
+    restart: unless-stopped
+volumes:
+  prometheus_data:
+  grafana_data:

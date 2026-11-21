@@ -1,0 +1,23 @@
+services:
+  frontend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.frontend
+    environment:
+      AUTH_URL: ${AUTH_URL:?Set the public HTTPS AUTH_URL}
+      AUTH_SECRET: ${AUTH_SECRET:?Set a distinct frontend AUTH_SECRET}
+      AUTH_BRIDGE_SECRET: ${AUTH_BRIDGE_SECRET:?Set AUTH_BRIDGE_SECRET}
+      BACKEND_URL: http://backend:8000
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      DEMO_LOGIN_ENABLED: "false"
+    expose: ["3000"]
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+  backend:
+    ports: !reset []
+    environment:
+      AUTH_ENABLED: "true"
+      DEMO_LOGIN_ENABLED: "false"

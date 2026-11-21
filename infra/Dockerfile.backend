@@ -1,0 +1,14 @@
+FROM python:3.12-slim
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 libstdc++6 tesseract-ocr tesseract-ocr-eng && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+COPY pyproject.toml requirements.lock ./
+RUN pip install --no-cache-dir -r requirements.lock
+ARG INSTALL_VOICE=false
+COPY infra/requirements-voice.txt ./
+RUN if [ "$INSTALL_VOICE" = "true" ]; then pip install --no-cache-dir -c requirements.lock -r requirements-voice.txt; fi
+COPY backend backend
+COPY crawler crawler
+RUN useradd --uid 10001 --create-home app && mkdir -p /home/app/.cache/fastembed && chown -R app:app /home/app/.cache
+USER app
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]

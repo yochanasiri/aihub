@@ -1,0 +1,242 @@
+[
+  {
+    "id": "Q01-programs",
+    "question": "Which B.Tech programs are offered at IIT Indore?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q02-admission",
+    "question": "What is the official admission process for B.Tech at IIT Indore?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q03-cutoffs",
+    "question": "Where does IIT Indore publish the current B.Tech admission cutoffs?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q04-fees",
+    "question": "Where can I find the current B.Tech fee structure?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q05-calendar",
+    "question": "Where is the current academic calendar for IIT Indore?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q06-curriculum",
+    "question": "Where can I find the B.Tech Computer Science curriculum?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q07-credits",
+    "question": "What are the official credit requirements for B.Tech graduation?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q08-attendance",
+    "question": "What attendance rules apply to undergraduate courses?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q09-grading",
+    "question": "How is the IIT Indore grading system defined?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q10-mtech",
+    "question": "What are the eligibility requirements for M.Tech admission?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q11-phd",
+    "question": "What is the official Ph.D. admission process?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q12-scholarships",
+    "question": "What scholarships or fee remission options are available to students?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q13-hostel-application",
+    "question": "How can a student apply for hostel accommodation?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q14-mess-menu",
+    "question": "Where is the current official hostel mess menu published?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q15-hostel-rules",
+    "question": "What are the official hostel rules for residents?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q16-library",
+    "question": "What are the official library opening hours?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q17-health",
+    "question": "How can students contact the campus health centre?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q18-sports",
+    "question": "What sports facilities are available on campus?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q19-placement-report",
+    "question": "Where can I find the latest official placement report?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q20-placement-statistics",
+    "question": "What placement statistics does the latest official report provide?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q21-internships",
+    "question": "What official information is available about student internships?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q22-placement-contact",
+    "question": "How can I contact the training and placement office?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q23-clubs",
+    "question": "Where can I find official information about student clubs?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q24-events",
+    "question": "What upcoming events are listed in official IIT Indore notices?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q25-address",
+    "question": "What is the official address of the IIT Indore Simrol campus?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q26-transport",
+    "question": "Where can I find the official campus shuttle schedule?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q27-exchange",
+    "question": "What international exchange programs are available to students?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q28-accessibility",
+    "question": "What official accessibility support is available to students with disabilities?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q29-emergency",
+    "question": "Where are official campus emergency contact numbers published?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": null
+  },
+  {
+    "id": "Q30-out-of-scope",
+    "question": "What is the current price of Bitcoin in US dollars?",
+    "filters": {},
+    "gold_source_urls": [],
+    "gold_answer_phrases": [],
+    "expected_status": "unanswered"
+  }
+]

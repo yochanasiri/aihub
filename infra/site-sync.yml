@@ -1,0 +1,39 @@
+# Use together with: -f infra/docker-compose.yml -f infra/site-sync.yml
+services:
+  site-sync:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    profiles: ["site-sync"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aihub}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-aihub}
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_API_KEY: ${QDRANT_API_KEY:-local-development-qdrant-key}
+      QDRANT_COLLECTION: ${QDRANT_COLLECTION:-iiti_official}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
+      EMBEDDING_CACHE_DIR: /home/app/.cache/fastembed
+      EMBEDDING_THREADS: ${EMBEDDING_THREADS:-2}
+      CHUNK_TOKENS: ${CHUNK_TOKENS:-700}
+      CHUNK_OVERLAP: ${CHUNK_OVERLAP:-64}
+      SEARCH_WINDOW_TOKENS: ${SEARCH_WINDOW_TOKENS:-460}
+      SEARCH_WINDOW_OVERLAP: ${SEARCH_WINDOW_OVERLAP:-32}
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://ollama:11434/v1}
+      LLM_MODEL: ${LLM_MODEL:-qwen2.5:3b-instruct}
+      AUTH_ENABLED: ${AUTH_ENABLED:-false}
+      AUTH_BRIDGE_SECRET: ${AUTH_BRIDGE_SECRET:-}
+      SITE_REFRESH_INTERVAL_SECONDS: ${SITE_REFRESH_INTERVAL_SECONDS:-7200}
+    user: "0:0" # Writes persistent crawl files into Docker named volume
+    volumes:
+      - iiti_site_crawl_data:/data
+      - ../IITI_Full_Site_Crawler:/app/site_crawler:ro
+      - ../crawler/seeds.json:/app/crawler/seeds.json:ro
+      - embedding_cache:/home/app/.cache/fastembed
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      qdrant:
+        condition: service_started
+    command: ["python", "-m", "backend.app.site_refresh"]
+    restart: unless-stopped
+volumes:
+  iiti_site_crawl_data:

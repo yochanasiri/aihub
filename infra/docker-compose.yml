@@ -1,0 +1,172 @@
+# Local base stack. See production.yml and monitoring.yml for optional overlays.
+x-rag-env: &rag-env
+  DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aihub}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-aihub}
+  QDRANT_URL: http://qdrant:6333
+  QDRANT_API_KEY: ${QDRANT_API_KEY:-local-development-qdrant-key}
+  EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
+  EMBEDDING_CACHE_DIR: /home/app/.cache/fastembed
+  LLM_BASE_URL: ${LLM_BASE_URL:-http://ollama:11434/v1}
+  LLM_MODEL: ${LLM_MODEL:-qwen2.5:3b-instruct}
+  LLM_API_KEY: ${LLM_API_KEY:-local}
+  LLM_TIMEOUT_SECONDS: ${LLM_TIMEOUT_SECONDS:-180}
+  GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+  GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.8-flash}
+  GEMINI_GOOGLE_SEARCH: ${GEMINI_GOOGLE_SEARCH:-true}
+  METRICS_ENABLED: ${METRICS_ENABLED:-false}
+  ANSWER_CACHE_ENABLED: ${ANSWER_CACHE_ENABLED:-false}
+  ANSWER_CACHE_TTL: ${ANSWER_CACHE_TTL:-300}
+  REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+  RAG_API_ENABLED: ${RAG_API_ENABLED:-false}
+  AUTH_ENABLED: ${AUTH_ENABLED:-false}
+  AUTH_BRIDGE_SECRET: ${AUTH_BRIDGE_SECRET:-}
+  GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+  INSTITUTE_DOMAIN: iiti.ac.in
+  SESSION_HOURS: ${SESSION_HOURS:-8}
+  DEMO_LOGIN_ENABLED: ${DEMO_LOGIN_ENABLED:-false}
+  SMTP_HOST: ${SMTP_HOST:-}
+  SMTP_PORT: ${SMTP_PORT:-587}
+  SMTP_USERNAME: ${SMTP_USERNAME:-}
+  SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+  SMTP_FROM: ${SMTP_FROM:-noreply@iiti.ac.in}
+  SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
+  SMTP_SSL: ${SMTP_SSL:-false}
+  RETRIEVAL_MIN_SCORE: ${RETRIEVAL_MIN_SCORE:-0.55}
+  QDRANT_COLLECTION: ${QDRANT_COLLECTION:-iiti_official}
+  EMBEDDING_THREADS: ${EMBEDDING_THREADS:-2}
+  CHUNK_TOKENS: ${CHUNK_TOKENS:-700}
+  CHUNK_OVERLAP: ${CHUNK_OVERLAP:-64}
+  SEARCH_WINDOW_TOKENS: ${SEARCH_WINDOW_TOKENS:-460}
+  SEARCH_WINDOW_OVERLAP: ${SEARCH_WINDOW_OVERLAP:-32}
+  RETRIEVAL_TOP_K: ${RETRIEVAL_TOP_K:-2}
+  CONTEXT_MAX_CHARACTERS: ${CONTEXT_MAX_CHARACTERS:-24000}
+  LLM_MAX_TOKENS: ${LLM_MAX_TOKENS:-1600}
+  MAX_CONCURRENT_CHATS: ${MAX_CONCURRENT_CHATS:-4}
+services:
+  redis:
+    image: redis:7.4-alpine
+    profiles: ["cache"]
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru"]
+    restart: unless-stopped
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aihub}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-aihub}
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  qdrant:
+    image: qdrant/qdrant:v1.16.3
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:-local-development-qdrant-key}
+    volumes: ["qdrant_data:/qdrant/storage"]
+    restart: unless-stopped
+  ollama:
+    image: ollama/ollama:0.13.5
+    environment:
+      OLLAMA_CONTEXT_LENGTH: 8192
+      OLLAMA_KEEP_ALIVE: -1
+    volumes: ["ollama_data:/root/.ollama"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+  migrate:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aihub}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-aihub}
+    command: ["alembic", "-c", "backend/alembic.ini", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+  backend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+      args:
+        INSTALL_VOICE: ${VOICE_ENABLED:-false}
+    environment:
+      <<: *rag-env
+      VOICE_ENABLED: ${VOICE_ENABLED:-false}
+      VOICE_WHISPER_MODEL: ${VOICE_WHISPER_MODEL:-base.en}
+      VOICE_MODEL_CACHE: /home/app/.cache/fastembed/voice
+      VOICE_PIPER_MODEL: /home/app/.cache/fastembed/voice/en_US-lessac-medium.onnx
+    ports: ["127.0.0.1:8000:8000"]
+    volumes:
+      - embedding_cache:/home/app/.cache/fastembed
+      - ../crawler/seeds.json:/app/crawler/seeds.json:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      qdrant:
+        condition: service_started
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 180s
+  crawler:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    profiles: ["crawl"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-aihub}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-aihub}
+    volumes: ["../crawler/seeds.json:/app/crawler/seeds.json:ro"]
+    command: ["python", "-m", "crawler.run"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+  indexer:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    profiles: ["index"]
+    environment: *rag-env
+    volumes:
+      - embedding_cache:/home/app/.cache/fastembed
+      - ../crawler/seeds.json:/app/crawler/seeds.json:ro
+    command: ["python", "-m", "backend.app.rag.index"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      qdrant:
+        condition: service_started
+  refresh:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    profiles: ["refresh"]
+    init: true
+    environment:
+      <<: *rag-env
+      REFRESH_INTERVAL_SECONDS: ${REFRESH_INTERVAL_SECONDS:-21600}
+    volumes:
+      - embedding_cache:/home/app/.cache/fastembed
+      - ../crawler/seeds.json:/app/crawler/seeds.json:ro
+    command: ["python", "-m", "backend.app.refresh"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      qdrant:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  qdrant_data:
+  ollama_data:
+  embedding_cache:

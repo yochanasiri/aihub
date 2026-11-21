@@ -1,0 +1,14 @@
+# Requires a running OpenAI-compatible server (e.g. a private vLLM deployment).
+services:
+  backend:
+    environment:
+      LLM_BASE_URL: ${LLM_BASE_URL:?Set the private OpenAI-compatible endpoint including /v1}
+      LLM_MODEL: ${LLM_MODEL:?Set the served model ID}
+      LLM_API_KEY: ${LLM_API_KEY:?Set the serving key}
+    depends_on: !override
+      migrate:
+        condition: service_completed_successfully
+      qdrant:
+        condition: service_started
+  ollama:
+    profiles: ["local-model"]

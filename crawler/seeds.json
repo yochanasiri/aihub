@@ -1,0 +1,32 @@
+{
+  "allowed_domains": [
+    "academic.iiti.ac.in",
+    "hostel.iiti.ac.in",
+    "iiti.ac.in",
+    "ir.iiti.ac.in",
+    "library.iiti.ac.in",
+    "placement.iiti.ac.in",
+    "rnd.iiti.ac.in",
+    "studentaffairs.iiti.ac.in",
+    "www.iiti.ac.in"
+  ],
+  "seeds": [
+    {
+      "url": "https://www.iiti.ac.in/",
+      "department": "Institute"
+    },
+    {
+      "url": "https://academic.iiti.ac.in/",
+      "department": "Academics"
+    }
+  ],
+  "user_agent": "IITI-AIHUB/0.1",
+  "max_pages": 3000,
+  "max_depth": 5,
+  "request_delay_seconds": 1.5,
+  "timeout_seconds": 30,
+  "max_bytes": 52428800,
+  "max_pdf_pages": 500,
+  "min_text_characters": 120,
+  "stale_after_days": 30
+}
