@@ -15,6 +15,7 @@ from .retrieval import Retriever
 from .focused import focused_quotes, structured_quotes, intent, entity, evidence_matches, structured_answer_markdown
 from .cache import QuoteCache
 from .conversation import route_turn
+from .document_answers import exhaustive_question, select_full_document, document_answer
 
 logger = logging.getLogger("aihub.rag")
 
@@ -51,6 +52,27 @@ class RAGService:
         if cached:
             for quote in cached:
                 yield quote
+            return
+        # Preserve the existing role-aware JD/eligibility extraction. Use the
+        # document-wide path for generic lists, counts and full-table requests.
+        full_pages = (select_full_document(evidence)
+                      if exhaustive_question(question) and not intent(question) else [])
+        if full_pages:
+            result = await document_answer(self.llm, question, full_pages)
+            if result:
+                items, complete = result
+                for number, item in enumerate(items, 1):
+                    heading = ''
+                    if number == 1 and len(items) > 1:
+                        heading = (f'**Total verified entries: {len(items)}**\n\n' if complete
+                                   else f'**{len(items)} verified entries (not confirmed complete)**\n\n')
+                    yield type('DocumentQuote', (), {
+                        'source_id':item.source_id,
+                        'quote':item.quote,
+                        'answer':heading + f'{number}. {escape_markdown(item.answer)}'
+                    })()
+            # If no verified items exist, do not fall through to title-only
+            # snippets or unrelated pages and present those as the answer.
             return
         # A whole-section request must not pass through the single-quote LLM
         # path or the field-label shortcut: serve the original full section.
@@ -149,7 +171,7 @@ class RAGService:
                 cache_key = None
                 if evidence:
                     cached = None
-                    if persist and self.cache and not intent(question):
+                    if persist and self.cache and not intent(question) and not exhaustive_question(question):
                         cache_key = self.cache.key(actor_id, question, evidence)
                         cached = await self.cache.get(cache_key, evidence)
                     metrics["cache_hit"] = cached is not None
@@ -163,7 +185,9 @@ class RAGService:
                             if source.get("page") and not source["url"].startswith(PREFIX):
                                 link += f"#page={source['page']}"
                             prose = verified.answer or natural_source_answer(verified.quote, question)
-                            if intent(question):
+                            if ':fullpage:' in source.get('parent_id', ''):
+                                block = f"{prose} [{verified.source_id}]({link})\n\n"
+                            elif intent(question):
                                 block = f"{structured_answer_markdown(prose)} [{verified.source_id}]({link})\n\n"
                             else:
                                 block = (f"{escape_markdown(prose)} [{verified.source_id}]({link})\n\n"

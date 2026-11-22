@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from bs4 import BeautifulSoup, Comment
 import pymupdf
 from .policy import normalize_url
+from backend.app.pdf_layout import extract_tables
 
 
 @dataclass
@@ -76,6 +77,9 @@ def extract_pdf(body: bytes, url: str, max_pages: int) -> Extracted:
         for i, page in enumerate(pdf):
             # Blocks retain more readable paragraph boundaries than one flattened page.
             text = "\n\n".join(clean(b[4]) for b in page.get_text("blocks") if b[6] == 0 and clean(b[4]))
+            tables = extract_tables(page)
+            if tables:
+                text = text + "\n\n" + tables
             pages.append({"page": i + 1, "text": text})
             text_parts.append(f"## Page {i + 1}\n\n{text}")
         if not any(p["text"] for p in pages):

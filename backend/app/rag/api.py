@@ -112,3 +112,9 @@ async def chat(body: ChatRequest, request: Request, actor=Depends(institutional_
             service.slots.release()
     return StreamingResponse(response(),media_type="text/event-stream",headers={
         "Cache-Control":"no-cache, no-transform","X-Accel-Buffering":"no","X-Content-Type-Options":"nosniff"})
+
+
+@router.post("/chat/pdf")
+async def chat_pdf(request: Request, actor=Depends(institutional_actor)):
+    from .pdf_chat import handle_pdf
+    return await handle_pdf(service_for(request), request)

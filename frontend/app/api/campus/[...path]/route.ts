@@ -17,7 +17,10 @@ async function handle(request:NextRequest,context:Context){
     (request.method==="PATCH" && (doc || target==="admin/retrieval-profile")) ||
     (request.method==="DELETE" && doc) ||
     (request.method==="POST" && (["admin/knowledge/upload","admin/retrieval-preview"].includes(target) || /^admin\/knowledge\/[a-f0-9-]{36}\/(publish|unpublish)$/.test(target))) ||
-    (request.method==="POST" && ["chat/stream","retrieve","gemini/chat"].includes(target)) ||
+    (request.method==="POST" && ["chat/stream","chat/pdf","retrieve","gemini/chat"].includes(target)) ||
+    (request.method==="POST" && ["gmail/connect","gmail/import","gmail/ask","gmail/ask/stream"].includes(target)) ||
+    (request.method==="DELETE" && target==="gmail/connection") ||
+    (request.method==="GET" && ["gmail/status","gmail/callback"].includes(target)) ||
     (request.method==="GET" && (["auth/me","admin/access","conversations","campus/status","campus/notices"].includes(target) || /^conversations\/[a-f0-9-]{36}\/messages$/.test(target))) ||
     (request.method==="PATCH" && /^admin\/users\/[a-f0-9-]{36}\/role$/.test(target));
   if(!allowed)return Response.json({detail:"Not found"},{status:404});

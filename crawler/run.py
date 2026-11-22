@@ -11,7 +11,7 @@ from backend.app.db import Session, engine
 from backend.app.models import CrawlLog, Document, now
 from .extract import extract_html, extract_pdf
 from .fetch import Fetcher
-from .policy import CrawlConfig, normalize_url
+from .policy import CrawlConfig, EXTERNAL_DOMAINS, normalize_url
 from .store import find_document, mark_stale, mark_unavailable, save_document
 
 
@@ -110,8 +110,14 @@ async def crawl(config: CrawlConfig, sessions=Session, fetcher=None):
 async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default=settings.crawler_config)
+    parser.add_argument("--references-only", action="store_true")
     args = parser.parse_args()
     config = CrawlConfig.model_validate_json(Path(args.config).read_text())
+    if args.references_only:
+        domains = [domain for domain in config.allowed_domains if domain in EXTERNAL_DOMAINS]
+        seeds = [seed for seed in config.seeds if urlsplit(seed.url).hostname in domains]
+        config = config.model_copy(update={"allowed_domains": domains, "seeds": seeds,
+                                          "max_pages": 70, "max_depth": 1})
     # One writer across cron/manual jobs. Session-level lock held on a dedicated connection.
     try:
         async with engine.connect() as connection:

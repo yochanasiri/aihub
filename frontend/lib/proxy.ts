@@ -55,6 +55,16 @@ export async function campusProxy(request:NextRequest,path:string) {
     catch {return Response.json({detail:"Upload exceeds 20 MiB or was interrupted"},{status:413});}
     headersIn["Content-Type"]="application/octet-stream";
     headersIn["X-AIHUB-Filename"]=(request.headers.get("x-aihub-filename") || "").slice(0,2048);
+  } else if(path==="chat/pdf") {
+    if(token.campusUser?.is_demo)
+      return Response.json({detail:"Sign in with an institute account to use PDF chat"},{status:403});
+    if(request.headers.get("content-type")!=="application/octet-stream")
+      return Response.json({detail:"Upload a single PDF"},{status:415});
+    try {body=new Uint8Array(await readBytes(request,10*1024*1024));}
+    catch {return Response.json({detail:"PDF exceeds 10 MiB or upload was interrupted"},{status:413});}
+    headersIn["Content-Type"]="application/octet-stream";
+    headersIn["X-AIHUB-Filename"]=(request.headers.get("x-aihub-filename")||"").slice(0,2048);
+    headersIn["X-AIHUB-Question"]=request.headers.get("x-aihub-question")||"";
   } else if(path==="voice/transcribe") {
     const kind=(request.headers.get("content-type")||"").split(";")[0].trim().toLowerCase();
     if(!["audio/webm","audio/ogg","audio/mp4"].includes(kind))
@@ -70,7 +80,13 @@ export async function campusProxy(request:NextRequest,path:string) {
     catch {return Response.json({detail:"Invalid or oversized JSON request"},{status:400});}
   }
   try {
-    const result=await fetch(`${c.backend}/v1/${path}${request.method==="GET" && request.nextUrl.searchParams.has("offset") ? `?offset=${encodeURIComponent(request.nextUrl.searchParams.get("offset")!)}` : ""}`,{method:request.method,cache:"no-store",
+    const query=request.method==="GET"&&path==="gmail/callback"
+      ? new URLSearchParams(["code","state"].filter(key=>request.nextUrl.searchParams.has(key))
+          .map(key=>[key,request.nextUrl.searchParams.get(key)!])).toString()
+      : request.method==="GET"&&request.nextUrl.searchParams.has("offset")
+        ? `offset=${encodeURIComponent(request.nextUrl.searchParams.get("offset")!)}`
+        : "";
+    const result=await fetch(`${c.backend}/v1/${path}${query?`?${query}`:""}`,{method:request.method,cache:"no-store",
       headers:headersIn,
       body,signal:request.signal});
     const headers=new Headers({"Content-Type":result.headers.get("Content-Type") || "application/json",

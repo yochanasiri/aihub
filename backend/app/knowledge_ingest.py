@@ -8,6 +8,7 @@ from pathlib import PurePath
 
 import pymupdf as fitz
 from PIL import Image, UnidentifiedImageError
+from .pdf_layout import extract_tables
 
 MAX_UPLOAD = 20 * 1024 * 1024
 MAX_TEXT = 400_000
@@ -305,6 +306,9 @@ def extract(filename, data):
                         raise ValueError(f"Split scanned PDFs into batches of at most {MAX_SCANNED_PAGES} scanned pages")
                     scale = min(2.5, (MAX_PIXELS / page.rect.get_area()) ** 0.5 * 0.95)
                     value = ocr(page.get_pixmap(matrix=fitz.Matrix(scale, scale), colorspace=fitz.csRGB))
+                tables = extract_tables(page)
+                if tables:
+                    value += "\n\n" + tables
                 total += len(value)
                 if total > MAX_TEXT:
                     raise ValueError("Extracted text exceeds 200,000 characters; split the file")

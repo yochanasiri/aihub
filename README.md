@@ -42,7 +42,7 @@ cp .env.example .env
 # Edit .env: set a strong URL-safe POSTGRES_PASSWORD and a QDRANT_API_KEY.
 # Keep RAG_API_ENABLED=false until the corpus and model are ready.
 docker compose --env-file .env -f infra/docker-compose.yml up --build -d postgres qdrant ollama migrate
-docker compose --env-file .env -f infra/docker-compose.yml exec ollama ollama pull qwen2.5:3b-instruct
+docker compose --env-file .env -f infra/docker-compose.yml exec ollama ollama pull qwen2.5:7b
 docker compose --env-file .env -f infra/docker-compose.yml --profile crawl run --rm crawler
 docker compose --env-file .env -f infra/docker-compose.yml --profile index run --rm indexer
 # Generate AUTH_BRIDGE_SECRET (paste into .env), then set AUTH_ENABLED=true.
@@ -70,6 +70,10 @@ npm run dev
 ```
 
 Open `http://localhost:3000/login`. The sign-in/register screen opens the responsive campus workspace after authentication. Configure Google OAuth and/or verified-email password registration before signing in. No real institute OAuth credentials were supplied or configured during this build.
+
+### Optional Gmail answers
+
+Gmail is a separate opt-in connection; Google sign-in alone never reads email. Enable the Gmail API in the same Google Cloud project, register `http://localhost:3000/api/gmail/callback`, and set backend `GMAIL_CLIENT_SECRET`, `GMAIL_REDIRECT_URI`, and a generated `GMAIL_TOKEN_ENCRYPTION_KEY` in addition to the existing matching `GOOGLE_CLIENT_ID`. The Gmail tab requests read-only access. Each signed-in user connects their own mailbox; mail answers use the configured model endpoint and are not saved to chat history. Users may optionally import mail in encrypted batches; disconnecting deletes those copies and attempts to revoke Google's grant. Set `LLM_BASE_URL` to a trusted local endpoint if messages must not leave your environment. Google may require verification/security review for the restricted Gmail scope. See [Gmail setup and data handling](backend/app/auth/README.md#optional-gmail-access).
 
 Read [authentication setup and security](backend/app/auth/README.md), [RAG/SSE protocol](backend/app/rag/README.md), and [evaluation instructions](evaluation/README.md). Set backend `AUTH_ENABLED=true`; enable the RAG model separately when ready. Demo access is disabled by default and, if enabled in both environments, is an isolated interface preview rather than institute access.
 
@@ -168,7 +172,7 @@ The `metadata` column maps to `Document.metadata_` because SQLAlchemy reserves `
 
 ## Ollama ↔ vLLM
 
-The backend uses the local OpenAI-compatible Chat Completions interface. No paid API is required. Ollama's Compose endpoint is `http://ollama:11434/v1`; the default model is `qwen2.5:3b-instruct`, sized for CPU-only development. The development container sets an 8K context window. Native Ollama deployments must configure sufficient context too.
+The backend uses the local OpenAI-compatible Chat Completions interface. No paid API is required. Ollama's Compose endpoint is `http://ollama:11434/v1`; the default model is `qwen2.5:7b`, selected for hosts with about 16 GB of RAM. The development container sets an 8K context window. Native Ollama deployments must configure sufficient context too.
 
 For an already running self-hosted vLLM server, set:
 
@@ -243,7 +247,7 @@ Keep your existing root `.env`, `frontend/.env.local`, and Docker volumes when u
 
 ```powershell
 docker compose --env-file .env -f infra/docker-compose.yml up -d ollama
-docker compose --env-file .env -f infra/docker-compose.yml exec ollama ollama pull qwen2.5:3b-instruct
+docker compose --env-file .env -f infra/docker-compose.yml exec ollama ollama pull qwen2.5:7b
 docker compose --env-file .env -f infra/docker-compose.yml up -d --build migrate backend
 ```
 

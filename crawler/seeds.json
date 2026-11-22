@@ -8,7 +8,14 @@
     "placement.iiti.ac.in",
     "rnd.iiti.ac.in",
     "studentaffairs.iiti.ac.in",
-    "www.iiti.ac.in"
+    "www.iiti.ac.in",
+    "*.iiti.ac.in",
+    "www.collegepravesh.com",
+    "collegepravesh.com",
+    "josaa.nic.in",
+    "www.josaa.nic.in",
+    "josaa.admissions.nic.in",
+    "en.wikipedia.org"
   ],
   "seeds": [
     {
@@ -17,6 +24,130 @@
     },
     {
       "url": "https://academic.iiti.ac.in/",
+      "department": "Academics"
+    },
+    {
+      "url": "https://www.iiti.ac.in/administration/director",
+      "department": "Administration"
+    },
+    {
+      "url": "https://academic.iiti.ac.in/academic_cal.php",
+      "department": "Academics"
+    },
+    {
+      "url": "https://cse.iiti.ac.in/",
+      "department": "Academics"
+    },
+    {
+      "url": "https://ee.iiti.ac.in/",
+      "department": "Academics"
+    },
+    {
+      "url": "https://me.iiti.ac.in/",
+      "department": "Academics"
+    },
+    {
+      "url": "https://placement.iiti.ac.in/",
+      "department": "Placements"
+    },
+    {
+      "url": "https://www.iiti.ac.in/uploads/reports/annual_report/22-23.pdf",
+      "department": "Placements"
+    },
+    {
+      "url": "https://www.iiti.ac.in/uploads/reports/parliamentary_questions/2024-2025.pdf",
+      "department": "Placements"
+    },
+    {
+      "url": "https://www.iiti.ac.in/public/storage/Report/convocation/IITI%20Convocation%20Report%202024.pdf",
+      "department": "Placements"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/IIT_Indore",
+      "department": "Institute history"
+    },
+    {
+      "url": "https://www.collegepravesh.com/engineering-colleges/iit-indore/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://josaa.nic.in/information-bulletin/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://josaa.nic.in/seat-matrix/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://josaa.nic.in/archive/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://josaa.admissions.nic.in/applicant/seatmatrix/OpeningClosingRankArchieve.aspx",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2016/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2017/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2018/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2019/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2020/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2021/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2022/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2023/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2024/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2025/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://www.collegepravesh.com/cutoff/iit-indore-cutoff-2026/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://josaa.nic.in/or-cr/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://josaa.nic.in/schedule/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://josaa.nic.in/josaa/",
+      "department": "Admissions"
+    },
+    {
+      "url": "https://cse.iiti.ac.in/research/areas",
+      "department": "Academics"
+    },
+    {
+      "url": "https://meche.iiti.ac.in/",
       "department": "Academics"
     }
   ],

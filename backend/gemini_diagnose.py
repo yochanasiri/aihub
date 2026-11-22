@@ -5,7 +5,7 @@ import httpx
 
 BASE = 'https://generativelanguage.googleapis.com/v1beta'
 key = os.getenv('GEMINI_API_KEY', '').strip()
-model = os.getenv('GEMINI_MODEL', 'gemini-3.8-flash').removeprefix('models/')
+model = os.getenv('GEMINI_MODEL', 'gemini-3.1-flash-lite').removeprefix('models/')
 print('Model:', model, '| Key configured:', bool(key), '| Search enabled:', os.getenv('GEMINI_GOOGLE_SEARCH'))
 if not key:
     raise SystemExit('GEMINI_API_KEY is missing')

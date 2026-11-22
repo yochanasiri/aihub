@@ -52,7 +52,7 @@ node -p "require('node:crypto').randomBytes(32).toString('hex')"
 ```powershell
 docker compose --env-file .env -f infra/docker-compose.yml config --quiet
 docker compose --env-file .env -f infra/docker-compose.yml up -d ollama
-docker compose --env-file .env -f infra/docker-compose.yml exec ollama ollama pull qwen2.5:3b-instruct
+docker compose --env-file .env -f infra/docker-compose.yml exec ollama ollama pull qwen2.5:7b
 docker compose --env-file .env -f infra/docker-compose.yml up -d --build migrate backend
 docker compose --env-file .env -f infra/docker-compose.yml ps -a
 npm --prefix frontend ci

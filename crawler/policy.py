@@ -5,6 +5,9 @@ from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
 from pydantic import BaseModel, Field, model_validator
 
 
+EXTERNAL_DOMAINS = {'josaa.nic.in', 'josaa.admissions.nic.in', 'collegepravesh.com', 'www.collegepravesh.com', 'www.josaa.nic.in', 'en.wikipedia.org'}
+
+
 class Seed(BaseModel):
     url: str
     department: str = "Institute"
@@ -28,6 +31,8 @@ class CrawlConfig(BaseModel):
         if not self.allowed_domains or not self.seeds:
             raise ValueError("At least one allowed domain and seed are required")
         for domain in self.allowed_domains:
+            if domain == "*.iiti.ac.in" or domain in EXTERNAL_DOMAINS:
+                continue
             if (domain != domain.lower() or not re.fullmatch(r"[a-z0-9.-]+", domain)
                     or not (domain == "iiti.ac.in" or domain.endswith(".iiti.ac.in"))
                     or ".." in domain):
@@ -43,7 +48,12 @@ def normalize_url(url: str, allowed_domains: list[str], base: str | None = None)
     p = urlsplit(urljoin(base, url) if base else url)
     if p.scheme not in ("https", "http") or p.username or p.password:
         raise ValueError("Only unauthenticated HTTP(S) URLs are allowed")
-    if p.hostname not in allowed_domains:
+    campus_subdomain = (p.hostname or "").endswith(".iiti.ac.in") and "*.iiti.ac.in" in allowed_domains
+    if p.hostname in {"collegepravesh.com", "www.collegepravesh.com"} and "iit-indore" not in p.path.casefold():
+        raise ValueError("College Pravesh crawl is limited to IIT Indore")
+    if p.hostname == "en.wikipedia.org" and p.path.rstrip("/") != "/wiki/IIT_Indore":
+        raise ValueError("Wikipedia crawl is limited to IIT Indore")
+    if p.hostname not in allowed_domains and not campus_subdomain:
         raise ValueError("Domain is not explicitly whitelisted")
     if p.port not in (None, 443 if p.scheme == "https" else 80):
         raise ValueError("Nonstandard ports are forbidden")

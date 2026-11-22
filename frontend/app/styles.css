@@ -41,10 +41,13 @@
 .review-entry p { white-space:pre-wrap; }
 .review-entry button { margin-left:.6rem; }
 
-/* Two independently scoped chat modes: campus RAG and Gemini */
+/* Independently scoped campus, Gemini, and Gmail chat modes */
 .aihub-mode-tabs{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 24px;border-bottom:1px solid #293951;background:#0f192b}
 .aihub-mode-tabs button{display:inline-flex;align-items:center;gap:8px;border:1px solid #394963;background:#152237;color:#b7c7df;border-radius:10px;padding:9px 13px;font-size:12px;font-weight:600}
 .aihub-mode-tabs button.active{background:#254b87;border-color:#6786c8;color:#fff}
 .aihub-mode-tabs button:disabled{opacity:.45;cursor:not-allowed}
 .aihub-mode-tabs span{color:#91a4bf;font-size:10px;margin-left:auto}
 @media(max-width:520px){.aihub-mode-tabs{padding:9px 12px;gap:6px}.aihub-mode-tabs button{font-size:10px;padding:8px}.aihub-mode-tabs span{width:100%;margin:0}}
+.gmail-tools{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;padding:8px 24px;background:#111d30;border-bottom:1px solid #293951}
+.gmail-tools>span{font-size:10px;color:#91a4bf;margin-right:auto}
+@media(max-width:520px){.gmail-tools{padding:8px 12px}.gmail-tools>span{width:100%}}

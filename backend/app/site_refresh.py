@@ -22,6 +22,7 @@ async def cycle(args):
                "--max-urls", str(args.max_urls), "--max-pdf-pages", str(args.max_pdf_pages),
                "--max-file-mb", str(args.max_file_mb), "--delay", str(args.delay))
     await call(sys.executable, "-m", "backend.app.site_import", "--crawl-root", "/data/iiti_full_crawl")
+    await call(sys.executable, "-m", "crawler.run", "--references-only")
     await call(sys.executable, "-m", "backend.app.rag.index")
     print("Site refresh finished: crawler -> PostgreSQL -> Qdrant", flush=True)
 

@@ -9,6 +9,7 @@ from .config import settings
 from .db import engine, Session
 from .rag.api import router
 from .gemini import router as gemini_router
+from .gmail import router as gmail_router
 from .auth.api import router as auth_router
 from .campus import router as campus_router
 from .knowledge import router as knowledge_router
@@ -31,9 +32,18 @@ def create_app(config=settings, rag_service=None, auth_service=None):
             embedder = BGEEmbedder(config)
             await embedder.warmup()
             app.state.rag_service = RAGService(config,Session,embedder,VectorStore(config,embedder.dim),LocalLLM(config))
+        standalone_gmail_llm = None
+        if app.state.rag_service is not None:
+            app.state.gmail_llm = app.state.rag_service.llm
+        elif config.google_client_id and config.gmail_client_secret:
+            from .rag.generation import LocalLLM
+            standalone_gmail_llm = LocalLLM(config)
+            app.state.gmail_llm = standalone_gmail_llm
         try:
             yield
         finally:
+            if standalone_gmail_llm:
+                await standalone_gmail_llm.close()
             if app.state.rag_service:
                 await app.state.rag_service.close()
             if app.state.auth_service.google:
@@ -43,6 +53,7 @@ def create_app(config=settings, rag_service=None, auth_service=None):
     app = FastAPI(title="IIT Indore AI Campus Assistant — AIHUB",version="0.5.0",
                   docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifespan)
     app.state.config, app.state.rag_service = config, rag_service
+    app.state.gmail_llm = getattr(rag_service, "llm", None)
     app.state.auth_service = auth_service or AuthService(config,Session,GoogleVerifier(config),SMTPMailer(config))
     app.state.gemini_slots = asyncio.Semaphore(3)
     app.state.knowledge_ingest = asyncio.Semaphore(1)
@@ -55,6 +66,7 @@ def create_app(config=settings, rag_service=None, auth_service=None):
     app.include_router(campus_router)
     app.include_router(router)
     app.include_router(gemini_router)
+    app.include_router(gmail_router)
 
     if config.metrics_enabled:
         @app.get("/metrics")

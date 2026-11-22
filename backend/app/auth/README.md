@@ -46,6 +46,22 @@ Accounts are located by Google `sub`, then by verified institute email for safe 
 
 No Google application credentials were provided in this session. Real Google authorization/consent has therefore not been exercised; local cryptographic tests use generated RSA keys and an injected certificate response.
 
+## Optional Gmail access
+
+The Gmail chat mode is a separate, per-user OAuth connection; institute sign-in does not grant mailbox access. In the Google Cloud project, enable the Gmail API and add this exact authorized redirect URI to the same Web OAuth client:
+
+- `http://localhost:3000/api/gmail/callback` locally; use your HTTPS frontend origin in production.
+
+Set `GMAIL_CLIENT_SECRET` and `GMAIL_REDIRECT_URI` in the backend environment, keep `GOOGLE_CLIENT_ID` identical in frontend and backend, and generate a Fernet key for `GMAIL_TOKEN_ENCRYPTION_KEY`:
+
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+In the UI, each signed-in institute user can connect their own Gmail account. Google consent requests only `gmail.readonly`; PKCE and a one-time, user-bound state protect the callback. Refresh tokens and any explicitly imported message content are encrypted at rest. The optional **Import next 200 emails** action can be repeated until the mailbox is imported. Disconnect deletes imported content and attempts to revoke the Google grant; if revocation is unavailable, also remove AIHUB from the Google Account security page. Protect the encryption key and database backups; losing or rotating the key makes stored imports unreadable.
+
+Questions search Gmail on demand and use at most eight relevant messages; completed imports are searched locally. Message content goes to the backend's configured `LLM_BASE_URL` for answer generation, not the Gemini API, and answers are not saved to chat history. Keep that model endpoint trusted and local if mail must not leave your environment. Gmail API access is disabled until configured. Google classifies `gmail.readonly` as a restricted scope; a public/external OAuth app may need Google verification and a security assessment. This repository does not include credentials or a completed live Google consent test.
+
 ## Email/password registration
 
 - Institute email domain is exact; deceptive suffixes, unapproved subdomains and malformed addresses are rejected.

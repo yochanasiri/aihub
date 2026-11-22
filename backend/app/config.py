@@ -21,12 +21,13 @@ class Settings(BaseSettings):
     retrieval_min_score: float = Field(0.55, ge=0, le=1)
     context_max_characters: int = Field(24000, ge=2000, le=50000)
     llm_base_url: str = "http://localhost:11434/v1"
-    llm_model: str = "qwen2.5:3b-instruct"
+    llm_model: str = "qwen2.5:7b"
+    gmail_llm_model: str = ""
     llm_api_key: str = "local"
     llm_max_tokens: int = Field(1600, ge=128, le=4096)
     llm_timeout_seconds: int = Field(180, ge=5, le=300)
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-3.8-flash"
+    gemini_model: str = "gemini-3.1-flash-lite"
     gemini_google_search: bool = True
     max_concurrent_chats: int = Field(4, ge=1, le=32)
     metrics_enabled: bool = False
@@ -40,6 +41,9 @@ class Settings(BaseSettings):
     auth_enabled: bool = False
     auth_bridge_secret: str = ""
     google_client_id: str = ""
+    gmail_client_secret: str = ""
+    gmail_redirect_uri: str = ""
+    gmail_token_encryption_key: str = ""
     institute_domain: str = "iiti.ac.in"
     session_hours: int = Field(8, ge=1, le=24)
     demo_login_enabled: bool = False

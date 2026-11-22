@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from uuid import uuid4
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Integer, JSON, String, Text
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Integer, JSON, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -156,6 +156,34 @@ class AuthAudit(Record, Base):
     subject_id: Mapped[str | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
     event: Mapped[str] = mapped_column(String(100))
     details: Mapped[dict] = mapped_column(json_type, default=dict)
+
+
+class GmailConnection(Record, Base):
+    __tablename__ = "gmail_connections"
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
+    email: Mapped[str] = mapped_column(String(320))
+    encrypted_refresh_token: Mapped[str] = mapped_column(Text)
+    import_page_token: Mapped[str | None] = mapped_column(Text)
+    imported_count: Mapped[int] = mapped_column(Integer, default=0)
+    import_complete: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class GmailOAuthState(Base):
+    __tablename__ = "gmail_oauth_states"
+    state_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    code_verifier: Mapped[str] = mapped_column(String(128))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+
+
+class GmailImportedMessage(Record, Base):
+    __tablename__ = "gmail_imported_messages"
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    provider_message_id: Mapped[str] = mapped_column(String(255))
+    encrypted_content: Mapped[str] = mapped_column(Text)
+    __table_args__ = (
+        UniqueConstraint("user_id", "provider_message_id", name="uq_gmail_imported_messages_owner_id"),
+    )
 
 
 class RetrievalProfile(Base):

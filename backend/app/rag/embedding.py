@@ -68,6 +68,13 @@ class BGEEmbedder:
         # Small bounded batches; duplicate passages reuse vectors, not LLM answers.
         return await asyncio.to_thread(lambda: [list(self._passage(value)) for value in values])
 
+    async def private_passages(self, values: list[str]):
+        def embed():
+            with self._lock:
+                self._load()
+                return list(self._model.passage_embed(values, batch_size=16))
+        return await asyncio.to_thread(embed)
+
     async def validate_query(self, value: str):
         text = "Represent this sentence for searching relevant passages: " + value
         if len(await asyncio.to_thread(self.tokens, text)) > self.config.search_window_tokens:

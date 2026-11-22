@@ -13,6 +13,12 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 UA='AIHUB-IITIndore-PublicIndexer/1.0 (academic RAG; respectful crawl)'
 SEEDS=[
  'https://www.iiti.ac.in/', 'https://www.iiti.ac.in/about',
+ 'https://www.iiti.ac.in/administration/director',
+ 'https://www.iiti.ac.in/uploads/reports/annual_report/22-23.pdf',
+ 'https://www.iiti.ac.in/uploads/reports/parliamentary_questions/2024-2025.pdf',
+ 'https://academic.iiti.ac.in/academic_cal.php',
+ 'https://cse.iiti.ac.in/faculty.php', 'https://cse.iiti.ac.in/research_area.php',
+ 'https://meche.iiti.ac.in/',
  'https://www.iiti.ac.in/academics', 'https://www.iiti.ac.in/academics/view_all',
  'https://www.iiti.ac.in/academics/courses/ug', 'https://www.iiti.ac.in/academics/forms_downloads',
  'https://www.iiti.ac.in/academics/scholarships', 'https://www.iiti.ac.in/admissions',
